@@ -1,5 +1,7 @@
 #include<cmath>
 #include<algorithm>
+#include<cassert>
+#include<iostream>
 
 #include "raylib.h"
 #include "utilities.h"
@@ -59,6 +61,10 @@ float rads_to_degrees(float value)
     return value*180/PI;
 }
 
+float get_gravity(float distance)
+{
+    return -(distance*distance)+1;
+}
 
 float friction_calc(float friction, float velocity)
 {   

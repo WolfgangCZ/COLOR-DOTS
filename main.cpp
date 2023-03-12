@@ -1,8 +1,13 @@
 #include <iostream>
+#include "color_dot.h"
 #include "raylib.h"
+#include "world.h"
+
 
 int main ()
 {
+
+    WorldPopulation world;
     const int screen_width {1600};
     const int screen_height {800};
     InitWindow(screen_width, screen_height, "New window");
@@ -23,11 +28,26 @@ int main ()
         //-------------------------------------------------------------------------------
         //GAME LOGIC
         //-------------------------------------------------------------------------------
-
-        // Camera zoom controls
         BeginDrawing();
         ClearBackground(BLACK);
         BeginMode2D(camera);
+
+        if(IsKeyPressed(KEY_I))
+        {
+            std::cout << "key I pressed" << std::endl;
+            world.add_dot();
+        }
+        if(IsKeyPressed(KEY_O))
+        {
+            std::cout << "key O pressed" << std::endl;
+            world.remove_dot();
+        }
+        
+        world.update_dots_velocity();
+        world.update_dots_movement();
+        world.draw_dots();
+        
+
 
 
         EndMode2D();
