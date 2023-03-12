@@ -9,9 +9,19 @@ ColorDot::ColorDot()
 {
 }
 
+ColorDot::ColorDot(const ColorDot &tmp) : m_x(tmp.m_x), m_y(tmp.m_y), 
+                                        m_vel_x(tmp.m_vel_x), m_vel_y(tmp.m_vel_y), 
+                                        m_radius(tmp.m_radius), 
+                                        m_color(tmp.m_color), m_color_true(tmp.m_color_true)
+{
+}
+
+
 ColorDot::~ColorDot()
 {
 }
+
+
 
 
 void ColorDot::update_draw()

@@ -3,6 +3,7 @@
 #include<cassert>
 #include<iostream>
 
+#include "global_variables.h"
 #include "raylib.h"
 #include "utilities.h"
 
@@ -63,7 +64,9 @@ float rads_to_degrees(float value)
 
 float get_gravity(float distance)
 {
-    return -(distance*distance)+1;
+    if(distance < 2*distance_threshold) return (distance - distance_threshold)*gravity_modifier;
+    else if (distance >= 2*distance_threshold && distance < 3*distance_threshold) return 3*distance_threshold-distance;
+    else return 0;
 }
 
 float friction_calc(float friction, float velocity)

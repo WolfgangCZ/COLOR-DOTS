@@ -6,8 +6,12 @@
 
 int main ()
 {
-
     WorldPopulation world;
+    size_t amount {50};
+    for(size_t i {0}; i<amount; i++)
+    {
+        world.add_dot();
+    }
     const int screen_width {1600};
     const int screen_height {800};
     InitWindow(screen_width, screen_height, "New window");

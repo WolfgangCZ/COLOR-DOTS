@@ -9,6 +9,7 @@
 struct ColorDot
 {
     ColorDot();
+    ColorDot(const ColorDot &tmp);
     ~ColorDot();
 
     void update_draw();

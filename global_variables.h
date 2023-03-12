@@ -1,8 +1,9 @@
 #ifndef GLOBAL_VARIABLES_H
 #define GLOBAL_VARIABLE S_H
 
-
+const float gravity_modifier {0.1};
 const float dot_radius {2};
+const float distance_threshold {30};
 const float gravity_matrix [7][7]
     {
         {1, 1, 1, 1, 1, 1, 1},  //GRAY
