@@ -1,18 +1,23 @@
 #ifndef GLOBAL_VARIABLES_H
 #define GLOBAL_VARIABLE S_H
 
-const float gravity_modifier {0.1};
+const int screen_width {800};
+const int screen_height {800};
+const float gravity_modifier {0.01};
 const float dot_radius {2};
-const float distance_threshold {30};
+const float max_velocity {2};
+const float friction {0.9};
+const float gravity_threshold {100};
+const float wall_bounciness {1};
 const float gravity_matrix [7][7]
     {
-        {1, 1, 1, 1, 1, 1, 1},  //GRAY
-        {1, 1, 1, 1, 1, 1, 1},  //RED
-        {1, 1, 1, 1, 1, 1, 1},  //GOLD
-        {1, 1, 1, 1, 1, 1, 1},  //LIME
-        {1, 1, 1, 1, 1, 1, 1},  //BLUE
-        {1, 1, 1, 1, 1, 1, 1},  //VIOLET
-        {1, 1, 1, 1, 1, 1, 1}   //BROWN
+        {1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0},  //GRAY
+        {0.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0},  //RED
+        {0.0, 0.0, 1.0, 0.5, 0.0, 0.0, 0.0},  //GOLD
+        {0.0, 0.0, 0.0, 1.0, 0.5, 0.0, 0.0},  //LIME
+        {0.0, 0.0, 0.0, 0.0, 1.0, 0.5, 0.0},  //BLUE
+        {0.0, 0.8, 0.0, 0.0, 0.0, 1.0, 0.5},  //VIOLET
+        {0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0}   //BROWN
     };
 
 #endif //GLOBAL_VARIABLES_H

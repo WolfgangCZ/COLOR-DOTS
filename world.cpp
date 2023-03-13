@@ -1,5 +1,5 @@
 #include "world.h"
-
+#include "utilities.h"
 
 #include <vector>
 #include <memory>
@@ -20,35 +20,66 @@ void WorldPopulation::remove_dot()
 
 void WorldPopulation::draw_dots()
 {
-    std::shared_ptr<ColorDot> pointer = nullptr;
     for(size_t i {0}; i<all_dots.size(); i++)
     {
-        pointer = all_dots[i];
-        pointer->update_draw();
+        all_dots[i]->update_draw();
     }
 }
 
 void WorldPopulation::update_dots_movement()
 {
-    std::shared_ptr<ColorDot> pointer = nullptr;
     for(size_t i {0}; i<all_dots.size(); i++)
     {
-        pointer = all_dots[i];
-        pointer->update_position();
+        all_dots[i]->update_position();
     }
 }
+
+
 
 void WorldPopulation::update_dots_velocity()
 {
-
     for(size_t i {0}; i<all_dots.size(); i++)
     {
-        for(size_t j {i}; j<all_dots.size()-i; j++)
+        for(size_t j {0}; j<all_dots.size(); j++)
         {
-            all_dots[i]->calc_vel_x(all_dots[j]);
-            all_dots[i]->calc_vel_y(all_dots[j]);
+            if(i==j) continue;
+            if(get_gravity(all_dots[j]->m_y - all_dots[i]->m_y) != 0) all_dots[i]->calc_vel_x(all_dots[j]);
+            if(get_gravity(all_dots[j]->m_x - all_dots[i]->m_x) != 0) all_dots[i]->calc_vel_y(all_dots[j]);
         }
     }
 }
+
+//check for boundaries
+void WorldPopulation::check_boundaries()
+{
+        for(size_t i {0}; i<all_dots.size(); i++)
+    {
+        //left boundary
+        if(all_dots[i]->m_x <= 0)
+        {
+            all_dots[i]->m_x = 0;
+            all_dots[i]->m_vel_x *= -1*wall_bounciness;
+        }
+        //right boundary
+        else if(all_dots[i]->m_x >= screen_width)
+        {
+            all_dots[i]->m_x = screen_width;
+            all_dots[i]->m_vel_x *= -1*wall_bounciness;
+        }
+        //upper boundary
+        else if(all_dots[i]->m_y <= 0)
+        {
+            all_dots[i]->m_y = 0;
+            all_dots[i]->m_vel_y *= -1*wall_bounciness;
+        }
+        //lower boundary
+        else if(all_dots[i]->m_y >= screen_height)
+        {
+            all_dots[i]->m_y = screen_height;
+            all_dots[i]->m_vel_y *= -1*wall_bounciness;
+        }
+    }
+}
+
 
 

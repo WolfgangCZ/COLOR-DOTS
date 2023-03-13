@@ -7,12 +7,12 @@
 int main ()
 {
     WorldPopulation world;
-    size_t amount {50};
+    size_t amount {1000};
     for(size_t i {0}; i<amount; i++)
     {
         world.add_dot();
     }
-    const int screen_width {1600};
+    const int screen_width {800};
     const int screen_height {800};
     InitWindow(screen_width, screen_height, "New window");
 
@@ -47,12 +47,10 @@ int main ()
             world.remove_dot();
         }
         
-        world.update_dots_velocity();
         world.update_dots_movement();
+        world.update_dots_velocity();
+        world.check_boundaries();
         world.draw_dots();
-        
-
-
 
         EndMode2D();
         EndDrawing();

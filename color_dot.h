@@ -22,8 +22,8 @@ struct ColorDot
 
     float m_x {static_cast<float>(GetRandomValue(200,600))};
     float m_y {static_cast<float>(GetRandomValue(200,600))};
-    float m_vel_x {};
-    float m_vel_y {};
+    float m_vel_x {0};
+    float m_vel_y {0};
     float m_radius {dot_radius};
     int m_color {GetRandomValue(0,6)}; //colors by number
     Color m_color_true {get_color()};

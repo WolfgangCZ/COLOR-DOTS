@@ -29,6 +29,7 @@ class WorldPopulation
     void draw_dots();
     void update_dots_velocity();
     void update_dots_movement();
+    void check_boundaries();
 
 };
 

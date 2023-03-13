@@ -32,19 +32,22 @@ void ColorDot::update_position()
 {
     m_x += m_vel_x;
     m_y += m_vel_y;
+    
 }
 
 //calculating velocity by calculating gravity for near objects
 void ColorDot::calc_vel_x(const std::shared_ptr<ColorDot>& other_dot)
 {
-    m_vel_x += get_gravity(other_dot->m_x - this->m_x)
-        *gravity_matrix[this->m_color][other_dot->m_color];
+    m_vel_x += get_gravity(other_dot->m_x - m_x)
+        *gravity_matrix[m_color][other_dot->m_color];
+    if(m_vel_x > max_velocity || -m_vel_x>max_velocity) m_vel_x*= friction;
 }
 
 void ColorDot::calc_vel_y (const std::shared_ptr<ColorDot>& other_dot)
 {
-    m_vel_y += get_gravity(other_dot->m_y - this->m_y)
-        *gravity_matrix[this->m_color][other_dot->m_color];
+    m_vel_y += get_gravity(other_dot->m_y - m_y)
+        *gravity_matrix[m_color][other_dot->m_color];
+    if(m_vel_y > max_velocity || -m_vel_y>max_velocity) m_vel_y*= friction;
 }
 
 Color ColorDot::get_color()

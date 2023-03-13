@@ -62,13 +62,43 @@ float rads_to_degrees(float value)
     return value*180/PI;
 }
 
-float get_gravity(float distance)
-{
-    if(distance < 2*distance_threshold) return (distance - distance_threshold)*gravity_modifier;
-    else if (distance >= 2*distance_threshold && distance < 3*distance_threshold) return 3*distance_threshold-distance;
-    else return 0;
-}
 
+//its not caluclating for negative values (or maybe it does?) no it doesnt
+float get_gravity(float distance)
+{        
+    //wonky equation for calculating gravity its just line on y axis from -1 to 1 and then back on 0 and 1,2,3 on x axis multiplies by gravity_threshold
+    //i know its bad to have two completely same equations with 1 and -1 but i didnt figure out better way on the spot now...
+    //i fix it later
+    //btw with this wonky formula the distance is actually 3/4 of actual distance :-/
+    //rework all this / negative value must be fixed! 
+    if(distance<0) 
+    {
+        distance *= -1;
+
+        if(distance <= gravity_threshold/2)
+        {
+            return -1*(distance-gravity_threshold/4)*gravity_modifier;
+        }
+        else if (distance > gravity_threshold/2 && distance < gravity_threshold/4*3)
+        {
+            return -1*(gravity_threshold/4*3-distance)*gravity_modifier;
+        }
+        else if (distance >= gravity_threshold/4*3) return 0;
+    }
+    else 
+    {
+        if(distance <= gravity_threshold/2)
+        {
+            return (distance-gravity_threshold/4)*gravity_modifier;
+        }
+        else if (distance > gravity_threshold/2 && distance < gravity_threshold/4*3)
+        {
+            return (gravity_threshold/4*3-distance)*gravity_modifier;
+        }
+        else if (distance >= gravity_threshold/4*3) return 0;
+    }
+    return 0;
+}
 float friction_calc(float friction, float velocity)
 {   
     return -(velocity*friction);
