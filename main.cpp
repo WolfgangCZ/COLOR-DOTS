@@ -7,7 +7,7 @@
 int main ()
 {
     WorldPopulation world;
-    size_t amount {1000};
+    size_t amount {500};
     for(size_t i {0}; i<amount; i++)
     {
         world.add_dot();

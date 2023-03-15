@@ -4,7 +4,9 @@
 #include <vector>
 #include <memory>
 
-
+//TODO
+//change to orto distance
+//make gravity matrix as module somehow
 
 void WorldPopulation::add_dot()
 {
@@ -14,8 +16,7 @@ void WorldPopulation::add_dot()
 
 void WorldPopulation::remove_dot()
 {
-    if(all_dots.size() > 0)
-    all_dots.erase(all_dots.end());
+    if(all_dots.size() > 0) all_dots.erase(all_dots.end());
 }
 
 void WorldPopulation::draw_dots()
