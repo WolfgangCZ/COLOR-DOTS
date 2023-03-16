@@ -70,34 +70,20 @@ float get_gravity(float distance)
     //i know its bad to have two completely same equations with 1 and -1 but i didnt figure out better way on the spot now...
     //i fix it later
     //btw with this wonky formula the distance is actually 3/4 of actual distance :-/
-    //rework all this / negative value must be fixed! 
-    if(distance<0) 
-    {
-        distance *= -1;
+    //rework all this / negative value must be fixed!
+    int dir_mod; 
+    if(distance<0) dir_mod = -1;
+    else if (distance>0) dir_mod = 1;        
 
-        if(distance <= gravity_threshold/2)
-        {
-            return -1*(distance-gravity_threshold/4)*gravity_modifier;
-        }
-        else if (distance > gravity_threshold/2 && distance < gravity_threshold/4*3)
-        {
-            return -1*(gravity_threshold/4*3-distance)*gravity_modifier;
-        }
-        else if (distance >= gravity_threshold/4*3) return 0;
-    }
-    else 
-    {
-        if(distance <= gravity_threshold/2)
-        {
-            return (distance-gravity_threshold/4)*gravity_modifier;
-        }
-        else if (distance > gravity_threshold/2 && distance < gravity_threshold/4*3)
-        {
-            return (gravity_threshold/4*3-distance)*gravity_modifier;
-        }
-        else if (distance >= gravity_threshold/4*3) return 0;
-    }
-    return 0;
+    if(distance <= repel_distance)
+        return -dir_mod*(distance-repel_distance)*repel_modifier;
+
+    else if (distance > repel_distance && distance < (gravity_distance/2+repel_distance))
+        return dir_mod*(distance*20/gravity_distance-repel_distance*20/gravity_distance)*gravity_modifier;
+
+    else if (distance >= (gravity_distance/2+repel_distance) && distance < (gravity_distance+repel_distance)) 
+        return dir_mod*(gravity_distance/2+repel_distance*2-distance)*gravity_modifier;
+    else return 0;
 }
 float friction_calc(float friction, float velocity)
 {   

@@ -23,6 +23,7 @@ float get_gravity(float distance);
 //ADD weight component and maybe terrain component for dynamic friction on map
 float friction_calc(float friction, float velocity);
 
+
 Color get_color (int number);
 
 #endif //UTILITES_H
