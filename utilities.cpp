@@ -1,6 +1,7 @@
 #include<cmath>
 #include<algorithm>
 #include<cassert>
+#include<cmath>
 #include<iostream>
 
 #include "global_variables.h"
@@ -20,8 +21,11 @@ float calculate_orto_lenght(float x, float y)
 {
     return std::sqrt(x*x+y*y);
 }
+//!!!!!!!!!!!!!!!!!!!!!!!!
+//rework for coordinates of raylib window!!!!!!
 float calculate_angle_xy(float x, float y)
 {
+    x *= -1; //is it correct?
     if(x == 0 && y == 0)        
     {
         return 0;
@@ -64,17 +68,14 @@ float rads_to_degrees(float value)
 
 
 //its not caluclating for negative values (or maybe it does?) no it doesnt
+//split this function in two!!!
+/*
 float get_gravity(float distance)
 {        
-    //wonky equation for calculating gravity its just line on y axis from -1 to 1 and then back on 0 and 1,2,3 on x axis multiplies by gravity_threshold
-    //i know its bad to have two completely same equations with 1 and -1 but i didnt figure out better way on the spot now...
-    //i fix it later
-    //btw with this wonky formula the distance is actually 3/4 of actual distance :-/
-    //rework all this / negative value must be fixed!
     int dir_mod; 
     if(distance<0) dir_mod = -1;
     else if (distance>0) dir_mod = 1;        
-
+    distance = abs(distance);
     if(distance <= repel_distance)
         return -dir_mod*(distance-repel_distance)*repel_modifier;
 
@@ -85,6 +86,26 @@ float get_gravity(float distance)
         return dir_mod*(gravity_distance/2+repel_distance*2-distance)*gravity_modifier;
     else return 0;
 }
+*/
+//better calculation
+
+float get_repel(float distance)
+{
+if(distance <= repel_distance)
+    return (distance-repel_distance)*repel_modifier;
+return 0;
+}
+
+float get_gravity(float distance)
+{            
+    if (distance > repel_distance && distance < (gravity_distance/2+repel_distance))
+        return (distance*20/gravity_distance-repel_distance*20/gravity_distance)*gravity_modifier;
+
+    else if (distance >= (gravity_distance/2+repel_distance) && distance < (gravity_distance+repel_distance)) 
+        return (gravity_distance/2+repel_distance*2-distance)*gravity_modifier;
+    else return 0;
+}
+
 float friction_calc(float friction, float velocity)
 {   
     return -(velocity*friction);

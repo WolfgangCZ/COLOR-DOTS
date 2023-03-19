@@ -2,6 +2,7 @@
 #define COLOR_DOT_H
 #include "global_variables.h"
 #include "raylib.h"
+#include "utilities.h"
 
 #include <memory>
 
@@ -15,13 +16,14 @@ struct ColorDot
     void update_draw();
     void update_position();
 
-    void calc_vel_x (const std::shared_ptr<ColorDot>& other_dot);
-    void calc_vel_y (const std::shared_ptr<ColorDot>& other_dot);
+    void calc_vel_from_gravity (const std::shared_ptr<ColorDot>& other_dot);
 
     Color get_color();
 
     float m_x {static_cast<float>(GetRandomValue(200,600))};
     float m_y {static_cast<float>(GetRandomValue(200,600))};
+    float m_vel {0}; //orto velocity
+    float m_dir {0}; //direction in rads
     float m_vel_x {0};
     float m_vel_y {0};
     float m_radius {dot_radius};

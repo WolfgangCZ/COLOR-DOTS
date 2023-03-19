@@ -1,6 +1,7 @@
 #include "world.h"
 #include "utilities.h"
 
+#include <cmath>
 #include <vector>
 #include <memory>
 
@@ -44,13 +45,8 @@ void WorldPopulation::update_dots_velocity()
         for(size_t j {0}; j<all_dots.size(); j++)
         {
             if(i==j) continue;
-            //need to pas absolute values
-
-            if(calculate_orto_lenght((all_dots[j]->m_x)-(all_dots[i]->m_x),(all_dots[j]->m_y)-(all_dots[i]->m_y)) < gravity_distance)
-            {
-                all_dots[i]->calc_vel_x(all_dots[j]);
-                all_dots[i]->calc_vel_y(all_dots[j]);
-            }
+            //probably need to seperate into x and y 
+            all_dots[i]->calc_vel_from_gravity(all_dots[j]);
         }
     }
 }

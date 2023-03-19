@@ -7,7 +7,7 @@
 int main ()
 {
     WorldPopulation world;
-    size_t amount {500};
+    size_t amount {400};
     for(size_t i {0}; i<amount; i++)
     {
         world.add_dot();
@@ -46,10 +46,10 @@ int main ()
             std::cout << "key O pressed" << std::endl;
             world.remove_dot();
         }
-        
-        world.update_dots_movement();
         world.update_dots_velocity();
         world.check_boundaries();
+        world.update_dots_movement();
+
         world.draw_dots();
 
         EndMode2D();
