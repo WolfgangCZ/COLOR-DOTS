@@ -7,34 +7,30 @@
 #include <cmath>
 //#include "world.h"
 
+#include "dot.h"
+#include "global_var.h"
 
 
-extern const std::size_t screen_w{800};
-extern const std::size_t screen_h{600};
-extern const std::size_t starting_dots {0};
-extern const float player_speed {0.1};
-extern const float friction {0.9};
-extern const float gravity_strenght {1};
-extern const float repel_strenght {gravity_strenght*2};
 
-struct Dot
+
+
+void get_gravity(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
 {
-    public:
-        Dot() = default;
-        Dot(float x, float y, float v_x, float v_y)
-            : m_pos{x,y}, m_vel{0,0}
-        {}
-        ~Dot()
-        {}
-        void update_movement(const Dot &other_dot)
-        {
-            Vector2Add(m_pos, m_vel);
-        }
+    Vector2 distance = Vector2{Vector2Subtract(this_dot->m_pos,other_dot->m_pos)};     
+    Vector2 gravity = Vector2Scale(Vector2Normalize(distance), gravity_strenght/Vector2Length(distance));
+    Vector2 repel = Vector2Scale(Vector2Normalize(distance), repel_strenght/(Vector2LengthSqr(distance)));
 
-        Vector2 m_pos{static_cast<float>(GetRandomValue(0,screen_h)),static_cast<float>(GetRandomValue(0,screen_w))}; //initialized on random position on map
-        Vector2 m_vel {0,0};
-        float m_radius {2};
-};
+    //use gravity
+    if(distance.x != 0 && distance.y != 0)
+    {
+        this_dot->m_vel = Vector2Subtract(this_dot->m_vel, gravity);
+        this_dot->m_vel = Vector2Add(this_dot->m_vel, repel);
+    }    
+    //std::cout << "distance: " << Vector2Length(distance);
+    //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
+}
+
+
 
 class World
 {
@@ -53,42 +49,28 @@ class World
         }
         void draw_dots()
         {
+            //check all dots with all dots and apply gravity
             for(std::size_t i {0}; i<all_dots.size(); i++)
             {
+                for(std::size_t j {0}; j<all_dots.size(); ++j)
+                {
+                    if(i == j) continue;
+                    get_gravity(all_dots[i], all_dots[j]);
+                }
+                //apply friction to speed
+                all_dots[i]->m_vel = Vector2Scale(all_dots[i]->m_vel, friction);
+                //update movement
+                all_dots[i]->m_pos = Vector2Add(all_dots[i]->m_pos, all_dots[i]->m_vel);
+                //draw dots
                 DrawCircle(all_dots[i]->m_pos.x, all_dots[i]->m_pos.y, all_dots[i]->m_radius, Color{WHITE});
-                
             }
         }
     private:
         std::vector<std::shared_ptr<Dot>> all_dots {};
 };
 
-//fix it bitch
-void get_gravity(Dot &this_dot, const Dot &other_dot)
-{
-    Vector2 distance = Vector2{Vector2Subtract(this_dot.m_pos,other_dot.m_pos)};     
-    Vector2 gravity = {};
-    if((distance.x < 1 && distance.x > -1))
-    {
-        if(distance.x != 0) distance.x /= abs(distance.x);
-        
-    }
-    if((distance.y < 1 && distance.y > -1))
-    {
-        if(distance.y != 0) distance.y /= abs(distance.y);
-    }
-
-    gravity = Vector2{gravity_strenght/distance.x, gravity_strenght/distance.y};
 
 
-    //use gravity
-    if(distance.x != 0 && distance.y != 0)
-    {
-        this_dot.m_vel = Vector2Subtract(this_dot.m_vel, gravity);
-    }    
-    std::cout << "distance: " << Vector2Length(distance);
-    std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
-}
 
 void update_player_pos(Dot &player)
 {
@@ -106,9 +88,9 @@ void draw_player(const Dot &player)
 
 int main ()
 {
+
     World world;
     Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0};
-    Dot other_dot {static_cast<float>(screen_w/3), static_cast<float>(screen_h/3),0,0};
     
     for(size_t i {0}; i<starting_dots; i++)
     {
@@ -173,10 +155,10 @@ int main ()
         }
         
         draw_player(player);
-        draw_player(other_dot);
         update_player_pos(player);
-        update_player_pos(other_dot);
-        get_gravity(player,other_dot);
+        world.draw_dots();
+
+
 
         //friction
         player.m_vel.x *= friction;
