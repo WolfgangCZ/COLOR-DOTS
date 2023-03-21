@@ -4,16 +4,18 @@
 //#include "dot.h"
 #include "raylib.h"
 #include "raymath.h"
+#include <cmath>
 //#include "world.h"
 
 
 
 extern const std::size_t screen_w{800};
 extern const std::size_t screen_h{600};
-extern const std::size_t starting_dots {2};
-extern const std::size_t gravity_modifier {1};
-extern const float player_speed {1};
+extern const std::size_t starting_dots {0};
+extern const float player_speed {0.1};
 extern const float friction {0.9};
+extern const float gravity_strenght {1};
+extern const float repel_strenght {gravity_strenght*2};
 
 struct Dot
 {
@@ -54,11 +56,25 @@ class World
             for(std::size_t i {0}; i<all_dots.size(); i++)
             {
                 DrawCircle(all_dots[i]->m_pos.x, all_dots[i]->m_pos.y, all_dots[i]->m_radius, Color{WHITE});
+                
             }
         }
     private:
         std::vector<std::shared_ptr<Dot>> all_dots {};
 };
+
+void get_gravity(Dot &this_dot, const Dot &other_dot)
+{
+    Vector2 distance = Vector2{Vector2Subtract(this_dot.m_pos,other_dot.m_pos)};                //calculate orto distance between two dots
+    if(Vector2Length(distance) < 1) Vector2Normalize(distance);
+    Vector2 gravity = Vector2Scale(distance, Vector2Length(distance)/gravity_strenght);
+
+    //use gravity
+    if(distance.x != 0 && distance.y != 0)
+    {
+        this_dot.m_vel = Vector2Subtract(this_dot.m_vel, gravity);
+    }    
+}
 
 void update_player_pos(Dot &player)
 {
@@ -78,6 +94,7 @@ int main ()
 {
     World world;
     Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0};
+    Dot other_dot {static_cast<float>(screen_w/3), static_cast<float>(screen_h/3),0,0};
     
     for(size_t i {0}; i<starting_dots; i++)
     {
@@ -98,6 +115,7 @@ int main ()
     SetTargetFPS(60);
     while(WindowShouldClose()==false)
     {
+
         //-------------------------------------------------------------------------------
         //GAME LOGIC
         //-------------------------------------------------------------------------------
@@ -141,7 +159,10 @@ int main ()
         }
         
         draw_player(player);
+        draw_player(other_dot);
         update_player_pos(player);
+        update_player_pos(other_dot);
+        get_gravity(player,other_dot);
 
         //friction
         player.m_vel.x *= friction;
@@ -152,7 +173,7 @@ int main ()
         world.check_boundaries();
         world.update_dots_movement();
         */
-        world.draw_dots();
+        //world.draw_dots();
         
         EndMode2D();
         EndDrawing();
