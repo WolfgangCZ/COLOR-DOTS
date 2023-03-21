@@ -63,17 +63,31 @@ class World
         std::vector<std::shared_ptr<Dot>> all_dots {};
 };
 
+//fix it bitch
 void get_gravity(Dot &this_dot, const Dot &other_dot)
 {
-    Vector2 distance = Vector2{Vector2Subtract(this_dot.m_pos,other_dot.m_pos)};                //calculate orto distance between two dots
-    if(Vector2Length(distance) < 1) Vector2Normalize(distance);
-    Vector2 gravity = Vector2Scale(distance, Vector2Length(distance)/gravity_strenght);
+    Vector2 distance = Vector2{Vector2Subtract(this_dot.m_pos,other_dot.m_pos)};     
+    Vector2 gravity = {};
+    if((distance.x < 1 && distance.x > -1))
+    {
+        if(distance.x != 0) distance.x /= abs(distance.x);
+        
+    }
+    if((distance.y < 1 && distance.y > -1))
+    {
+        if(distance.y != 0) distance.y /= abs(distance.y);
+    }
+
+    gravity = Vector2{gravity_strenght/distance.x, gravity_strenght/distance.y};
+
 
     //use gravity
     if(distance.x != 0 && distance.y != 0)
     {
         this_dot.m_vel = Vector2Subtract(this_dot.m_vel, gravity);
     }    
+    std::cout << "distance: " << Vector2Length(distance);
+    std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 }
 
 void update_player_pos(Dot &player)
