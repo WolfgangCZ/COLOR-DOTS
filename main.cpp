@@ -14,12 +14,12 @@
 
 
 //limit applied force
-void get_gravity(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
+void get_gravity_v1(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
 {
     Vector2 distance = Vector2{Vector2Subtract(this_dot->m_pos,other_dot->m_pos)};
     Vector2 gravity = Vector2Scale(Vector2Normalize(distance), gravity_matrix[this_dot->m_color][other_dot->m_color]*gravity_strenght/Vector2Length(distance));
     Vector2 repel = Vector2Scale(Vector2Normalize(distance), abs(gravity_matrix[this_dot->m_color][other_dot->m_color])*repel_strenght/(Vector2LengthSqr(distance)));
-    if(Vector2Length(distance) > max_gravity_distance)
+    if(Vector2Length(distance) > gravity_distance)
     {   
         gravity = Vector2Zero();
         repel = Vector2Zero();
@@ -36,6 +36,26 @@ void get_gravity(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other
     //std::cout << "distance: " << Vector2Length(distance);
     //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 }
+void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
+{
+    Vector2 distance = Vector2{Vector2Subtract(this_dot->m_pos,other_dot->m_pos)};
+    Vector2 gravity;
+    Vector2 repel;
+
+
+
+    if(Vector2Length(gravity) > max_applied_force) gravity = Vector2Scale(Vector2Normalize(gravity), max_applied_force);    //checking max gravity force
+    if(Vector2Length(repel) > max_applied_force) repel = Vector2Scale(Vector2Normalize(repel), max_applied_force);          //checking max repel force
+
+    //use gravity
+    if(distance.x != 0 && distance.y != 0)
+    {
+        this_dot->m_vel = Vector2Subtract(this_dot->m_vel, gravity);
+        this_dot->m_vel = Vector2Add(this_dot->m_vel, repel);
+    }    
+    //std::cout << "distance: " << Vector2Length(distance);
+    //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
+} 
 
 
 class World
@@ -66,7 +86,7 @@ class World
                 for(std::size_t j {0}; j<all_dots.size(); ++j)
                 {
                     if(i == j) continue;
-                    get_gravity(all_dots[i], all_dots[j]);
+                    get_gravity_v1(all_dots[i], all_dots[j]);
                 }
                 //apply friction to speed
                 all_dots[i]->m_vel = Vector2Scale(all_dots[i]->m_vel, friction);
@@ -107,6 +127,30 @@ void bounce_walls(std::vector<std::shared_ptr<Dot>> &all_dots)
     }
 }
 
+void teleport_walls(std::vector<std::shared_ptr<Dot>> &all_dots)
+{
+    for(std::size_t i {0}; i<all_dots.size(); ++i)
+    {
+        if(all_dots[i]->m_pos.x < 0)
+        {
+            all_dots[i]->m_pos.x = screen_w;
+        }
+        if(all_dots[i]->m_pos.x > screen_w)
+        {
+            all_dots[i]->m_pos.x = 0;
+        }
+        if(all_dots[i]->m_pos.y < 0)
+        {
+            all_dots[i]->m_pos.y = screen_h;
+        }
+        if(all_dots[i]->m_pos.y > screen_h)
+        {
+            all_dots[i]->m_pos.y = 0;
+
+        }
+    }
+}
+
 
 
 
@@ -126,7 +170,6 @@ void draw_player(const Dot &player)
 
 int main ()
 {
-
     World world;
     Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0};
     
