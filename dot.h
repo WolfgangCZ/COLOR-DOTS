@@ -9,6 +9,10 @@ struct Dot
         {}
         ~Dot()
         {}
+        Dot *get_ptr()
+        {
+            return this;
+        }
         void update_movement(const Dot &other_dot)
         {
             Vector2Add(m_pos, m_vel);

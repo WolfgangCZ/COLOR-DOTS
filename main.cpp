@@ -36,25 +36,78 @@ void get_gravity_v1(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> ot
     //std::cout << "distance: " << Vector2Length(distance);
     //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 }
+
+
+//basicaly this function calculate gravity or repel strenght based on distance between dots
+//its a linear function
+//max distance of gravitational field is repel_distance + gravity_distance
+//peak repel strenght is at 0 distance
+//0 gravity is at crossing of repel_distance and gravity_distance, or in other words 0 gravity is at max repel distance and 0 gravity_distance
+//peak gravity strenght is at repel_distnace + gravity_distance/2
+//0 gravity is if distance of dots is greater than gravity_distance + repel_distance
+
+
 void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
 {
-    Vector2 distance = Vector2{Vector2Subtract(this_dot->m_pos,other_dot->m_pos)};
-    Vector2 gravity;
-    Vector2 repel;
+    //calculating distance
+    Vector2 distance_vec = Vector2{Vector2Subtract(this_dot->m_pos,other_dot->m_pos)};  //vector value
+    float distance_scal = Vector2Length(distance_vec);                                  //scalar value
 
+    //initializing just direction of the forces
+    Vector2 gravity {Vector2Normalize(distance_vec)};   
+    Vector2 repel {Vector2Normalize(distance_vec)};
 
+    //if other dot is in distance of repel force
+    if(distance_scal <= repel_distance)
+    {
+        gravity = Vector2Zero();
+        //linear function: min -repel_strenght at 0, max 0 at repel_distance
+    }
+        repel = Vector2Scale(distance_vec,
+            abs(gravity_matrix[this_dot->m_color][other_dot->m_color])                          // scaling by gravity matrix
+            * repel_strenght - repel_strenght / repel_distance * distance_scal); 
 
+    //if other dot is in distance between repel_distnace and repel_distnace + gravity_distance/2
+    if(distance_scal > repel_distance && distance_scal < repel_distance + gravity_distance/2)
+    {
+        repel = Vector2Zero();
+        //linear function : min 0 at repel distance, max gravity_strenght at gravity_distance/2 + repel_distance
+        gravity = Vector2Scale(distance_vec, 
+            gravity_matrix[this_dot->m_color][other_dot->m_color]                               // scaling by gravity matrix
+            * (distance_scal - repel_distance) * gravity_strenght / gravity_distance * 2);      
+        
+    }
+    //if other dot is in distance between repel_distnace + gravity_distance/2 and repel_distnace + gravity_distance
+    if(distance_scal > (repel_distance + gravity_distance/2) && distance_scal < (repel_distance + gravity_distance))
+    {
+        repel = Vector2Zero();
+        //linear function : max gravity_strenght at repel distance + gravity_distance/2, 0 gravity if distance is more than gravity_distance + repel_distance
+        gravity = Vector2Scale(distance_vec, 
+            gravity_matrix[this_dot->m_color][other_dot->m_color]                               // scaling by gravity matrix
+            * (gravity_strenght - gravity_strenght / gravity_distance * 2 * (distance_scal - repel_distance - gravity_distance * 2)));         
+    }
+
+    //checking for max gravity field of a dot
+    if(distance_scal > gravity_distance + repel_distance)
+    {   
+        gravity = Vector2Zero();
+        repel = Vector2Zero();
+    }
+
+    //limit max gravity strengtht (optional)
     if(Vector2Length(gravity) > max_applied_force) gravity = Vector2Scale(Vector2Normalize(gravity), max_applied_force);    //checking max gravity force
     if(Vector2Length(repel) > max_applied_force) repel = Vector2Scale(Vector2Normalize(repel), max_applied_force);          //checking max repel force
 
-    //use gravity
-    if(distance.x != 0 && distance.y != 0)
+    //apply gravity, check for 0
+    if(distance_vec.x != 0 && distance_vec.y != 0)
     {
         this_dot->m_vel = Vector2Subtract(this_dot->m_vel, gravity);
         this_dot->m_vel = Vector2Add(this_dot->m_vel, repel);
-    }    
-    //std::cout << "distance: " << Vector2Length(distance);
-    //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
+    } 
+
+    std::cout << "distance: " << distance_scal;
+    std::cout << " repel: " << Vector2Length(repel);
+    std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 } 
 
 
@@ -64,6 +117,10 @@ class World
         void add_dot_on_click()
         {
             all_dots.push_back(std::make_shared<Dot> (Dot{GetMousePosition().x, GetMousePosition().y,0.0f,0.0f}));
+        }
+        void add_custom_dot(const std::shared_ptr<Dot> & operand)
+        {
+            all_dots.push_back(operand);
         }
         void add_rand_dot()
         {
@@ -86,7 +143,7 @@ class World
                 for(std::size_t j {0}; j<all_dots.size(); ++j)
                 {
                     if(i == j) continue;
-                    get_gravity_v1(all_dots[i], all_dots[j]);
+                    get_gravity_v2(all_dots[i], all_dots[j]);
                 }
                 //apply friction to speed
                 all_dots[i]->m_vel = Vector2Scale(all_dots[i]->m_vel, friction);
@@ -172,7 +229,10 @@ int main ()
 {
     World world;
     Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0};
-    
+    std::shared_ptr<Dot> player_ptr = static_cast<std::shared_ptr<Dot>>(player.get_ptr());
+    world.add_custom_dot(player_ptr);
+
+
     for(size_t i {0}; i<starting_dots; i++)
     {
         world.add_rand_dot();
@@ -235,7 +295,7 @@ int main ()
             world.add_dot_on_click();
         }
         
-        draw_player(player);
+        //draw_player(player);
         update_player_pos(player);
         world.draw_dots();
         bounce_walls(world.get_all_dots());
