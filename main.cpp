@@ -54,41 +54,36 @@ void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> ot
     float distance_scal = Vector2Length(distance_vec);                                  //scalar value
 
     //initializing just direction of the forces
-    Vector2 gravity {Vector2Normalize(distance_vec)};   
-    Vector2 repel {Vector2Normalize(distance_vec)};
+    Vector2 gravity {Vector2Zero()};   
+    Vector2 repel {Vector2Zero()};
 
     //if other dot is in distance of repel force
     if(distance_scal <= repel_distance)
     {
-        gravity = Vector2Zero();
-        //linear function: min -repel_strenght at 0, max 0 at repel_distance
-    }
+        //linear function: min -repel_strenght at 0, max 0 at repel_distance  
         repel = Vector2Scale(distance_vec,
-            abs(gravity_matrix[this_dot->m_color][other_dot->m_color])                          // scaling by gravity matrix
-            * repel_strenght - repel_strenght / repel_distance * distance_scal); 
-
+            abs(gravity_matrix[this_dot->m_color][other_dot->m_color]) 
+            * (repel_strenght - repel_strenght / repel_distance * distance_scal)); 
+    }
     //if other dot is in distance between repel_distnace and repel_distnace + gravity_distance/2
-    if(distance_scal > repel_distance && distance_scal < repel_distance + gravity_distance/2)
+    if(distance_scal > repel_distance && distance_scal < (repel_distance + gravity_distance/2))
     {
-        repel = Vector2Zero();
         //linear function : min 0 at repel distance, max gravity_strenght at gravity_distance/2 + repel_distance
         gravity = Vector2Scale(distance_vec, 
-            gravity_matrix[this_dot->m_color][other_dot->m_color]                               // scaling by gravity matrix
-            * (distance_scal - repel_distance) * gravity_strenght / gravity_distance * 2);      
+            (gravity_matrix[this_dot->m_color][other_dot->m_color]                               // scaling by gravity matrix
+            * (distance_scal - repel_distance) * gravity_strenght / gravity_distance * 2));      
         
     }
     //if other dot is in distance between repel_distnace + gravity_distance/2 and repel_distnace + gravity_distance
-    if(distance_scal > (repel_distance + gravity_distance/2) && distance_scal < (repel_distance + gravity_distance))
+    if(distance_scal >= (repel_distance + gravity_distance/2) && distance_scal < (repel_distance + gravity_distance))
     {
-        repel = Vector2Zero();
         //linear function : max gravity_strenght at repel distance + gravity_distance/2, 0 gravity if distance is more than gravity_distance + repel_distance
         gravity = Vector2Scale(distance_vec, 
             gravity_matrix[this_dot->m_color][other_dot->m_color]                               // scaling by gravity matrix
-            * (gravity_strenght - gravity_strenght / gravity_distance * 2 * (distance_scal - repel_distance - gravity_distance * 2)));         
+            * (gravity_strenght - gravity_strenght / gravity_distance * 2 * (distance_scal - repel_distance - gravity_distance / 2)));         
     }
-
     //checking for max gravity field of a dot
-    if(distance_scal > gravity_distance + repel_distance)
+    if(distance_scal > (gravity_distance + repel_distance))
     {   
         gravity = Vector2Zero();
         repel = Vector2Zero();
@@ -105,9 +100,9 @@ void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> ot
         this_dot->m_vel = Vector2Add(this_dot->m_vel, repel);
     } 
 
-    std::cout << "distance: " << distance_scal;
-    std::cout << " repel: " << Vector2Length(repel);
-    std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
+    //std::cout << "distance: " << distance_scal;
+    //std::cout << " repel: " << Vector2Length(repel);
+    //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 } 
 
 
@@ -145,12 +140,20 @@ class World
                     if(i == j) continue;
                     get_gravity_v2(all_dots[i], all_dots[j]);
                 }
-                //apply friction to speed
+
+            }
+
+            for(std::size_t i {0}; i<all_dots.size(); i++)
+            {
+            //apply friction to speed
+            if(Vector2Length(all_dots[i]->m_vel) > max_speed)
+            {
                 all_dots[i]->m_vel = Vector2Scale(all_dots[i]->m_vel, friction);
-                //update movement
-                all_dots[i]->m_pos = Vector2Add(all_dots[i]->m_pos, all_dots[i]->m_vel);
-                //draw dots
-                DrawCircle(all_dots[i]->m_pos.x, all_dots[i]->m_pos.y, all_dots[i]->m_radius, all_dots[i]->m_color_true);
+            }
+            //update movement
+            all_dots[i]->m_pos = Vector2Add(all_dots[i]->m_pos, all_dots[i]->m_vel);
+            //draw dots
+            DrawCircle(all_dots[i]->m_pos.x, all_dots[i]->m_pos.y, all_dots[i]->m_radius, all_dots[i]->m_color_true);
             }
         }
     private:
