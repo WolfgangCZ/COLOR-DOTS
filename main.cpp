@@ -61,9 +61,7 @@ void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> ot
     if(distance_scal <= repel_distance)
     {
         //linear function: min -repel_strenght at 0, max 0 at repel_distance  
-        repel = Vector2Scale(distance_vec,
-            abs(gravity_matrix[this_dot->m_color][other_dot->m_color]) 
-            * (repel_strenght - repel_strenght / repel_distance * distance_scal)); 
+        repel = Vector2Scale(distance_vec, (repel_strenght - repel_strenght / repel_distance * distance_scal)); 
     }
     //if other dot is in distance between repel_distnace and repel_distnace + gravity_distance/2
     if(distance_scal > repel_distance && distance_scal < (repel_distance + gravity_distance/2))
@@ -301,7 +299,7 @@ int main ()
         //draw_player(player);
         update_player_pos(player);
         world.draw_dots();
-        bounce_walls(world.get_all_dots());
+        teleport_walls(world.get_all_dots());
 
 
         //friction
