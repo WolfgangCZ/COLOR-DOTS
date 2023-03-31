@@ -103,13 +103,17 @@ void get_gravity_v2(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> ot
     //std::cout << " gravity: " << Vector2Length(gravity) << std::endl;
 } 
 
+struct ColorPallete
+{
+    Color selected_color = Color{GRAY};
+};
 
 class World
 {
     public:
-        void add_dot_on_click()
+        void add_dot_on_click(const ColorPallete &color)
         {
-            all_dots.push_back(std::make_shared<Dot> (Dot{GetMousePosition().x, GetMousePosition().y,0.0f,0.0f}));
+            all_dots.push_back(std::make_shared<Dot> (Dot{GetMousePosition().x, GetMousePosition().y,0.0f,0.0f, color.selected_color}));
         }
         void add_custom_dot(const std::shared_ptr<Dot> & operand)
         {
@@ -212,6 +216,7 @@ void teleport_walls(std::vector<std::shared_ptr<Dot>> &all_dots)
 
 
 
+
 void update_player_pos(Dot &player)
 {
     player.m_pos = Vector2Add(player.m_pos, player.m_vel);
@@ -222,14 +227,17 @@ void draw_player(const Dot &player)
     DrawCircle(player.m_pos.x, player.m_pos.y, player.m_radius, Color{RED});
 }
 
+
+
 //--------------------------------------------------------------------------------------------
 //MAIN FUNCTION
 //--------------------------------------------------------------------------------------------
 
 int main ()
 {
+    size_t dot_count = starting_dots;
     World world;
-    Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0};
+    Dot player {static_cast<float>(screen_w/2), static_cast<float>(screen_h/2),0,0, Color{GRAY}};
     std::shared_ptr<Dot> player_ptr = static_cast<std::shared_ptr<Dot>>(player.get_ptr());
     world.add_custom_dot(player_ptr);
 
@@ -249,6 +257,7 @@ int main ()
     camera.rotation = 0;
     camera.zoom = 1;
 
+    ColorPallete color_pallete{GRAY};
 
     SetTargetFPS(60);
     while(WindowShouldClose()==false)
@@ -260,6 +269,8 @@ int main ()
         BeginDrawing();
         ClearBackground(BLACK);
         BeginMode2D(camera);
+
+        DrawRectangle(20,20,20,20, color_pallete.selected_color);
 
         if(IsKeyDown(KEY_LEFT))
         {
@@ -277,23 +288,33 @@ int main ()
         {
         player.m_vel.y += player_speed;
         }
+        if(IsKeyPressed(KEY_C))
+        {
+            static size_t color_number {0};
+            color_number++;
+            if(color_number > 6) color_number = 0;
+            color_pallete.selected_color = get_color_from_number(color_number);
+        }
 
 
 
         if(IsKeyPressed(KEY_I))
         {
+            dot_count++;
             std::cout << "key I pressed" << std::endl;
             world.add_rand_dot();
         }
         if(IsKeyPressed(KEY_O))
         {
+            dot_count++;
             std::cout << "key O pressed" << std::endl;
             world.remove_dot();
         }
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {  
+            dot_count++;
             std::cout << "mouse left button pressed" << std::endl;
-            world.add_dot_on_click();
+            world.add_dot_on_click(color_pallete);
         }
         
         //draw_player(player);
@@ -312,7 +333,8 @@ int main ()
         world.update_dots_movement();
         */
         //world.draw_dots();
-        
+        DrawText(TextFormat("Dot count: %03i", dot_count), 10, 50, 10, RED);
+
         EndMode2D();
         EndDrawing();
     }

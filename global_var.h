@@ -28,5 +28,47 @@ float gravity_matrix [7][7]
         //lower left - column repel row
     };
 
+    
+Color get_color_from_number(size_t selected_color)
+{
+    //std::cout << "inside get color" << std::endl;
+    switch (selected_color)
+    {
+        case 0: 
+            //std::cout << "getting gray" << std::endl;
+            return Color{GRAY};
+            break;
+        case 1: 
+            //std::cout << "getting red" << std::endl;
+            return Color{RED};
+            break;
+        case 2: 
+            //std::cout << "getting gold" << std::endl;
+            return Color{GOLD};
+            break;
+        case 3: 
+            //std::cout << "getting lime" << std::endl;
+            return Color{LIME};
+            break;
+        case 4: 
+            //std::cout << "getting blue" << std::endl;
+            return Color{BLUE};
+            break;
+        case 5: 
+            //std::cout << "getting violet" << std::endl;
+            return Color{VIOLET};
+            break;
+        case 6: 
+            //std::cout << "getting brown" << std::endl;
+            return BROWN;
+            break;       
+        default:
+            //std::cout << "WARINGNG default color of dot called!" << std::endl;
+            return GRAY;
+            break;
+    }
+    return GRAY;
+}
+
 
 #endif //GLOBAL_VAR_H
