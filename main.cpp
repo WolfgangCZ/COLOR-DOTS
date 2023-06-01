@@ -259,7 +259,7 @@ int main ()
 
     ColorPallete color_pallete{GRAY};
 
-    SetTargetFPS(60);
+    SetTargetFPS(30);
     while(WindowShouldClose()==false)
     {
 
