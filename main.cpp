@@ -11,7 +11,7 @@
 #include "global_var.h"
 
 
-
+//dddfasdf
 
 //limit applied force
 void get_gravity_v1(std::shared_ptr<Dot> this_dot, const std::shared_ptr<Dot> other_dot)
