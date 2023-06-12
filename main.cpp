@@ -253,7 +253,7 @@ int main ()
 
     Camera2D camera {0};
     camera.target = camera_position;
-    camera.offset = (Vector2){screen_w/2,screen_h/2};
+    camera.offset = Vector2{screen_w/2,screen_h/2};
     camera.rotation = 0;
     camera.zoom = 1;
 
